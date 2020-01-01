@@ -1,43 +1,29 @@
 <template>
-  <v-content>
-    <v-container class="fill-height" fluid>
-      <v-row align="center" justify="center">
-        <v-col cols="12" sm="8" md="6">
-          <v-card class="elevation-12">
-            <v-toolbar color="primary" dark flat>
-              <v-toolbar-title>Register form</v-toolbar-title>
-              <v-spacer />
-            </v-toolbar>
-            <v-row align="center" justify="center">
-              <v-col cols="12" sm="8" md="10">
-                <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-text-field
-                    v-model="name"
-                    :counter="10"
-                    :rules="nameRules"
-                    label="Name"
-                    required
-                  ></v-text-field>
-                  <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
-                  <v-text-field
-                    v-model="password"
-                    :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[passwordRules.required, passwordRules.min]"
-                    :type="show ? 'text' : 'password'"
-                    label="Password"
-                    hint="At least 8 characters"
-                    counter
-                    @click:append="show = !show"
-                  ></v-text-field>
-                  <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">Validate</v-btn>
-                </v-form>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-content>
+  <v-card class="elevation-12">
+    <v-toolbar color="primary" dark flat>
+      <v-toolbar-title>Register form</v-toolbar-title>
+      <v-spacer />
+    </v-toolbar>
+    <v-row align="center" justify="center">
+      <v-col cols="12" sm="8" md="10">
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <v-text-field v-model="name" :counter="10" :rules="nameRules" label="Name" required></v-text-field>
+          <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+          <v-text-field
+            v-model="password"
+            :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+            :rules="[passwordRules.required, passwordRules.min]"
+            :type="show ? 'text' : 'password'"
+            label="Password"
+            hint="At least 8 characters"
+            counter
+            @click:append="show = !show"
+          ></v-text-field>
+          <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">Validate</v-btn>
+        </v-form>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script>
@@ -59,8 +45,16 @@ export default {
     passwordRules: {
       required: value => !!value || "Required.",
       min: v => (v && v.length >= 8) || "Min 8 characters"
-    }
+    },
+    token: ""
   }),
+  mounted() {
+    this.token = this.getCookie("token");
+    console.log("EIII FORM VALID", this.token);
+    if (this.token === "") {
+      this.$router.push({ name: "login" });
+    }
+  },
   methods: {
     validate() {
       if (this.$refs.form.validate()) {
