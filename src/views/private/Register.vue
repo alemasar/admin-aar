@@ -19,7 +19,23 @@
             counter
             @click:append="show = !show"
           ></v-text-field>
-          <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">Validate</v-btn>
+          <v-autocomplete
+            v-model="role"
+            :loading="loading"
+            :items="items"
+            item-text="role"
+            item-value="id"
+            class="mt-3"
+            cache-items
+            hide-no-data
+            hide-details
+            label="User role"
+          ></v-autocomplete>
+          <div class="row">
+            <div class="col">
+              <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">Validate</v-btn>
+            </div>
+          </div>
         </v-form>
       </v-col>
     </v-row>
@@ -46,6 +62,10 @@ export default {
       required: value => !!value || "Required.",
       min: v => (v && v.length >= 8) || "Min 8 characters"
     },
+    loading: false,
+    items: [],
+    role: null,
+    states: [],
     token: ""
   }),
   mounted() {
@@ -53,6 +73,17 @@ export default {
     console.log("EIII FORM VALID", this.token);
     if (this.token === "") {
       this.$router.push({ name: "login" });
+    } else {
+      const options = { headers: { Authorization: `Bearer ${this.token}` } };
+      this.axios
+        .post("http://backend.aar/roles", {}, options)
+        .then(response => {
+          this.items = response.data;
+          //console.log(this.states);
+        })
+        .catch(e => {
+          console.log(e.response.data.error);
+        });
     }
   },
   methods: {
@@ -67,7 +98,8 @@ export default {
             {
               name: this.name,
               email: this.email,
-              password: this.password
+              password: this.password,
+              role: this.role
             },
             options
           )

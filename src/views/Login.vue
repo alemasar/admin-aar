@@ -22,7 +22,11 @@
                     counter
                     @click:append="show = !show"
                   ></v-text-field>
-                  <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">Login</v-btn>
+                  <div class="row">
+                    <div class="col">
+                      <v-btn :disabled="!valid" color="success" class="mr-4" @click="validate">Login</v-btn>
+                    </div>
+                  </div>
                 </v-form>
               </v-col>
             </v-row>
