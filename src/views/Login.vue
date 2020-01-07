@@ -3,6 +3,7 @@
     <v-container class="fill-height" fluid>
       <v-row align="center" justify="center">
         <v-col cols="12" sm="8" md="6">
+          <v-alert type="error" v-if="error">{{ error }}</v-alert>
           <v-card class="elevation-12">
             <v-toolbar color="primary" dark flat>
               <v-toolbar-title>Login form</v-toolbar-title>
@@ -51,16 +52,14 @@ export default {
     passwordRules: {
       required: value => !!value || "Required.",
       min: v => (v && v.length >= 8) || "Min 8 characters"
-    }
+    },
+    error: null
   }),
   methods: {
-    validate() {
+    async validate() {
       if (this.$refs.form.validate()) {
-        console.log("EIII FORM VALID");
-
         const options = {};
-
-        this.axios
+        const response = await this.axios
           .post(
             "http://backend.aar/api/tokens",
             {
@@ -69,23 +68,26 @@ export default {
             },
             options
           )
-          .then(response => {
-            console.log(response.data);
-            // The JWT from the response object
-            const token = response.data.access_token;
-
-            // Max age in seconds
-            const maxAge = response.data.expires_in;
-
-            // Set samesite cookie
-            document.cookie =
-              "token=" + token + "; path=/; SameSite=Lax; max-age=" + maxAge;
-            //console.log(document.cookie);
-            this.$router.push({ name: "register" });
-          })
           .catch(e => {
             console.log(e.response.data.error);
+            this.error = e.response.data.error;
+            return e.response.data;
           });
+        console.log(response);
+        if (response.data) {
+          console.log(response.data);
+          // The JWT from the response object
+          const token = response.data.access_token;
+
+          // Max age in seconds
+          const maxAge = response.data.expires_in;
+
+          // Set samesite cookie
+          document.cookie =
+            "token=" + token + "; path=/; SameSite=Lax; max-age=" + maxAge;
+          //console.log(document.cookie);
+          this.$router.push({ name: "register" });
+        }
       }
     }
   }
